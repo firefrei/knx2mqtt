@@ -1,0 +1,8 @@
+services:
+  knx2mqtt:
+    build:
+      context: "."
+    image: "knx2mqtt"
+    restart: always
+    volumes:
+      - "./config/knx2mqtt.yaml:/config/knx2mqtt.yaml"
