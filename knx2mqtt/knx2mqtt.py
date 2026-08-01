@@ -3,7 +3,7 @@
 import argparse
 import asyncio
 
-from .knx2mqtt import config, daemon
+from knx2mqtt import config, daemon
 
 
 async def main():
