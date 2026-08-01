@@ -103,9 +103,6 @@ class MqttAdapter:
 
     def init(self):
         """Create MQTT-Client object with user configuration"""
-        self._connected = self.loop.create_future()
-        self._messages: asyncio.Queue[mqtt.MQTTMessage] = asyncio.Queue()
-
         self._client = mqtt.Client(CallbackAPIVersion.VERSION2, client_id=self._config['client_id'])
         if self._config['user'] or self._config['password']:
             self._client.username_pw_set(self._config['user'], self._config['password'])
