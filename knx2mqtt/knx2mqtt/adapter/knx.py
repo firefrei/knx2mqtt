@@ -76,7 +76,10 @@ class KnxAdapter:
         self.log.info("XKNX instance (version %s) for connection to KNX gateway %s created. KNX address of this instance is %s." % (self._xknx.version, conn_config.gateway_ip, self._xknx.current_address))
 
     def set_telegram_cb(self, cb):
-        self._xknx.telegram_queue.register_telegram_received_cb(cb, self._address_filters)
+        self._xknx.telegram_queue.register_telegram_received_cb(
+            telegram_received_cb=cb,
+            group_addresses=self._address_filters
+        )
 
     def get_subscriptions(self):
         return self._subscription_filters
