@@ -7,6 +7,7 @@ from xknx.io import ConnectionConfig, ConnectionType
 from xknx.dpt import DPTBinary
 from xknx.telegram import AddressFilter, GroupAddressType
 from xknx.tools import group_value_write
+from xknx.core import XknxConnectionState
 
 XKNX_DPT_MODULE_STR = "xknx.dpt"
 
@@ -72,7 +73,12 @@ class KnxAdapter:
         self.log.debug("KNX connection type is {0}".format(conn_type))
 
         # Step 2: Create XKNX object with configuration
-        self._xknx = XKNX(**gen_config, daemon_mode=True, connection_config=conn_config)
+        self._xknx = XKNX(
+            **gen_config,
+            daemon_mode=True,
+            connection_config=conn_config,
+            connection_state_changed_cb=self.on_connection_state_changed
+        )
         self.log.info("XKNX instance (version %s) for connection to KNX gateway %s created. KNX address of this instance is %s." % (self._xknx.version, conn_config.gateway_ip, self._xknx.current_address))
 
     def set_telegram_cb(self, cb):
@@ -80,6 +86,9 @@ class KnxAdapter:
             telegram_received_cb=cb,
             group_addresses=self._address_filters
         )
+
+    def on_connection_state_changed(self, state: XknxConnectionState):
+        self.log.info("KNX gateway connection state changed to: {0}".format(state.name))
 
     def get_subscriptions(self):
         return self._subscription_filters
