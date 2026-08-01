@@ -23,10 +23,10 @@ async def main():
         user_read_cfg.update({'file': args.config})
 
     # Setup app
-    cfg = config.Config(**user_cfg)
+    cfg = config.ConfigManager(**user_cfg)
     cfg.read(**user_read_cfg)
     d = daemon.Daemon(cfg)
-    d.run()
+    await d.run()
 
 if __name__ == "__main__":
     asyncio.run(main())
