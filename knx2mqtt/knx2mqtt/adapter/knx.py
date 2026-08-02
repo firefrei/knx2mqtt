@@ -84,11 +84,11 @@ class KnxAdapter:
     def set_telegram_cb(self, cb):
         self._xknx.telegram_queue.register_telegram_received_cb(
             telegram_received_cb=cb,
-            group_addresses=self._address_filters
+            address_filters=self._address_filters
         )
 
     def on_connection_state_changed(self, state: XknxConnectionState):
-        self.log.info("KNX gateway connection state changed to: {0}".format(state.name))
+        self.log.info("KNX gateway connection state changed to: {0} (own address: {1})".format(state.name, self._xknx.current_address))
 
     def get_subscriptions(self):
         return self._subscription_filters
