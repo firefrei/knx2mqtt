@@ -24,8 +24,9 @@ class Daemon:
         self._adapt_knx.init()
 
     def _init_handler(self):
-        KnxToMqtt(self._adapt_knx, self._adapt_mqtt)
-        MqttToKnx(self._adapt_knx, self._adapt_mqtt)
+        knx_address_filters, mqtt_subscriptions = self.config_mgr.generate_address_filters_and_subscriptions()
+        KnxToMqtt(self._adapt_knx, self._adapt_mqtt, knx_address_filters=knx_address_filters)
+        MqttToKnx(self._adapt_knx, self._adapt_mqtt, mqtt_subscriptions=mqtt_subscriptions)
 
     def run(self):
         self._adapt_mqtt.run()

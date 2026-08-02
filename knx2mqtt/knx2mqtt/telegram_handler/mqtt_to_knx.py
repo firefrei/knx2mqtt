@@ -9,13 +9,12 @@ from ..adapter.mqtt import MqttAdapter
 
 class MqttToKnx:
 
-    def __init__(self, knx_adapter: KnxAdapter, mqtt_adapter: MqttAdapter):
+    def __init__(self, knx_adapter: KnxAdapter, mqtt_adapter: MqttAdapter, mqtt_subscriptions: list = None):
         self._knx = knx_adapter
         self._mqtt = mqtt_adapter
+        self._subscriptions = mqtt_subscriptions
 
         self.log = logging.getLogger(__name__)
-
-        self._subscriptions = self._knx.get_subscriptions()
 
         # Register callback functions
         self._mqtt.set_message_cb(self.on_message)

@@ -8,14 +8,14 @@ from xknx.telegram import TelegramDirection
 
 class KnxToMqtt:
 
-    def __init__(self, knx_adapter: KnxAdapter, mqtt_adapter: MqttAdapter):
+    def __init__(self, knx_adapter: KnxAdapter, mqtt_adapter: MqttAdapter, knx_address_filters: list = None):
         self._knx = knx_adapter
         self._mqtt = mqtt_adapter
 
         self.log = logging.getLogger(__name__)
 
         # Register callback functions
-        self._knx.set_telegram_cb(self.on_telegram)
+        self._knx.set_telegram_cb(self.on_telegram, address_filters=knx_address_filters)
 
     def on_telegram(self, telegram):
         try:

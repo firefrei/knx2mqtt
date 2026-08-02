@@ -2,6 +2,8 @@ import yaml
 import logging
 import logging.config
 
+from xknx.telegram import AddressFilter
+
 
 class ConfigManager:
     """Class for parsing and managing the contents of the `knx2mqtt.yaml` configuration file."""
@@ -28,7 +30,6 @@ class ConfigManager:
     def knx(self):
         return self._knx
 
-    
     def read(self, file: str = 'knx2mqtt.yaml'):
         """Open and read config file."""
         logging.debug("Reading %s", file)
@@ -40,6 +41,21 @@ class ConfigManager:
         except FileNotFoundError as ex:
             logging.error("Configuration file %s not found: %s", file, ex)
             exit(ex.errno)
+
+    def generate_address_filters_and_subscriptions(self) -> tuple:
+        # Configure group address filters
+        knx_address_filters = []
+        mqtt_subscriptions = []
+
+        for entity_type in ['sensors', 'switches']:
+            for entity in self._knx[entity_type]:
+                if not ('expose' in entity and entity['expose']):
+                    knx_address_filters.append(AddressFilter(entity['address']))
+
+                if ('expose' in entity and entity['expose']) or ('subscribe' in entity and entity['subscribe']):
+                    mqtt_subscriptions.append(entity['address'])
+        
+        return knx_address_filters, mqtt_subscriptions
 
     def _parse_mqtt(self, config):
         """Parse the mqtt section of the config file."""

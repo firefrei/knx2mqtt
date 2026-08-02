@@ -19,20 +19,6 @@ class KnxAdapter:
 
         self.log = logging.getLogger(__name__)
 
-        # Configure group address filters
-        self._address_filters = list()
-        self._subscription_filters = list()
-        for sensor in self._config['sensors']:
-            if not ('expose' in sensor and sensor['expose']):
-                self._address_filters.append(AddressFilter(sensor['address']))
-            if ('expose' in sensor and sensor['expose']) or ('subscribe' in sensor and sensor['subscribe']):
-                self._subscription_filters.append(sensor['address'])
-        for switch in self._config['switches']:
-            if not ('expose' in switch and switch['expose']):
-                self._address_filters.append(AddressFilter(switch['address']))
-            if ('expose' in switch and switch['expose']) or ('subscribe' in switch and switch['subscribe']):
-                self._subscription_filters.append(switch['address'])
-
     async def run(self):
         try:
             self.log.info("Starting XKNX daemon...")
@@ -79,19 +65,16 @@ class KnxAdapter:
             connection_config=conn_config,
             connection_state_changed_cb=self.on_connection_state_changed
         )
-        self.log.info("XKNX instance (version %s) for connection to KNX gateway %s created. KNX address of this instance is %s." % (self._xknx.version, conn_config.gateway_ip, self._xknx.current_address))
+        self.log.info("XKNX instance (version %s) for connection to KNX gateway %s created. Own NX address of this instance is currently %s." % (self._xknx.version, conn_config.gateway_ip, self._xknx.current_address))
 
-    def set_telegram_cb(self, cb):
+    def set_telegram_cb(self, cb, address_filters: list = None):
         self._xknx.telegram_queue.register_telegram_received_cb(
             telegram_received_cb=cb,
-            address_filters=self._address_filters
+            address_filters=address_filters
         )
 
     def on_connection_state_changed(self, state: XknxConnectionState):
         self.log.info("KNX gateway connection state changed to: {0} (own address: {1})".format(state.name, self._xknx.current_address))
-
-    def get_subscriptions(self):
-        return self._subscription_filters
 
     def find_dpt_type(self, group_address):
         self.log.debug("Try to get dtype for group address {0}".format(group_address))
