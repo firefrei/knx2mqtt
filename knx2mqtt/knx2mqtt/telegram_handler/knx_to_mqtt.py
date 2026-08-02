@@ -17,7 +17,7 @@ class KnxToMqtt:
         # Register callback functions
         self._knx.set_telegram_cb(self.on_telegram)
 
-    async def on_telegram(self, telegram):
+    def on_telegram(self, telegram):
         try:
             self.log.info("KNX telegram received: {}".format(telegram))
 
@@ -25,7 +25,7 @@ class KnxToMqtt:
                 return
 
             group_address = str(telegram.destination_address)
-            value = self._knx.extract_payload_from_telegram(group_address, telegram)
+            value = self._knx.extract_value_from_telegram(group_address, telegram)
 
             # Publish on MQTT topic
             self._mqtt.publish(group_address, value)
