@@ -1,4 +1,4 @@
-# knx2mqtt - a KNX-to-MQTT bridge supporting bidirectional telegram transfer
+# knx2mqtt - a KNX-to-MQTT bridge supporting bidirectional data transfer
 
 ## Build and Run as a Container
 
@@ -82,9 +82,9 @@ knx:
       gateway_ip: '192.168.0.11'
       gateway_port: 3671
       local_ip: '192.168.0.12'
-      route_back: true    # behind NAT -> "true"; else "false"
+      #route_back: false    # behind NAT -> "true"; else "false"
 ```
-Since the knx2mqtt bridge runs as a container, `route_back` must be set to `true` or the  network mode `host` has to be used for the container.
+When knx2mqtt runs behind NAT, such as in a container, `route_back` must be set to `true`. Otherwise, e.g., using the container with network mode `host` or with a docker `macvlan` network, `route_back` should default to false.
 
 As of today, the bridge supports `sensors` and `switches` as native entities:
 ```yaml
