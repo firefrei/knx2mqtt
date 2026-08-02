@@ -33,26 +33,26 @@ class KnxAdapter:
 
         ## General configuration for XKNX
         gen_config = {}
-        if 'general' in self._config:
-            gen_config = self._config['general']
-            if 'address_format' in gen_config:
-                addr_format_str = str(gen_config['address_format']).upper()
-                gen_config['address_format'] = GroupAddressType[addr_format_str]
-                logging.debug("KNX address format is {0}".format(gen_config['address_format']))			
+        if "general" in self._config:
+            gen_config = self._config["general"]
+            if "address_format" in gen_config:
+                addr_format_str = str(gen_config["address_format"]).upper()
+                gen_config["address_format"] = GroupAddressType[addr_format_str]
+                logging.debug("KNX address format is {0}".format(gen_config["address_format"]))			
 
         ## Connection configuation for XKNX
         conn_type = ConnectionType.AUTOMATIC
         conn_params = {}
-        if 'connection' in self._config:
-            if 'routing' in self._config['connection']:
+        if "connection" in self._config:
+            if "routing" in self._config["connection"]:
                 conn_type = ConnectionType.ROUTING
-                conn_params = self._config['connection']['routing']
-            elif 'tunneling' in self._config['connection']:
+                conn_params = self._config["connection"]["routing"]
+            elif "tunneling" in self._config["connection"]:
                 conn_type = ConnectionType.TUNNELING
-                conn_params = self._config['connection']['tunneling']
+                conn_params = self._config["connection"]["tunneling"]
 
                 # Resolve gateway ip, if needed
-                conn_params['gateway_ip'] = socket.gethostbyname(conn_params['gateway_ip'])
+                conn_params["gateway_ip"] = socket.gethostbyname(conn_params["gateway_ip"])
 
         ## Create XKNX Configuration object
         conn_config = ConnectionConfig(**conn_params, connection_type=conn_type)
@@ -79,9 +79,9 @@ class KnxAdapter:
     def find_dpt_type(self, group_address):
         self.log.debug("Try to get dtype for group address {0}".format(group_address))
 
-        dpttype = next((sensor['type'] for sensor in self._config['sensors'] if sensor['address'] == group_address), None)
+        dpttype = next((sensor["type"] for sensor in self._config["sensors"] if sensor["address"] == group_address), None)
         if not dpttype:
-            dpttype = next((switch['type'] for switch in self._config['switches'] if switch['address'] == group_address), None)
+            dpttype = next((switch["type"] for switch in self._config["switches"] if switch["address"] == group_address), None)
         return dpttype
 
     def extract_value_from_telegram(self, group_address, telegram):
@@ -92,7 +92,7 @@ class KnxAdapter:
             self.log.debug(f"Address: {group_address}, DPT Type: {dpt_type}, Payload: {payload}")
     
             try:
-                if dpt_type == 'DPTBinary':
+                if dpt_type == "DPTBinary":
                     value = int(bool(payload.value.value))
                 else:
                     if dpt_type is None:
@@ -112,8 +112,8 @@ class KnxAdapter:
 
         dpt_value = None
         try:
-            if dpt_type == 'DPTBinary':
-                dpt_value = DPTBinary(int(str(raw_value).lower() in ['true', '1', 'on', 'yes']))
+            if dpt_type == "DPTBinary":
+                dpt_value = DPTBinary(int(str(raw_value).lower() in ["true", "1", "on", "yes"]))
             else:
                 dpt_class = getattr(importlib.import_module(XKNX_DPT_MODULE_STR), dpt_type)
                 dpt_value = dpt_class.to_knx(raw_value)

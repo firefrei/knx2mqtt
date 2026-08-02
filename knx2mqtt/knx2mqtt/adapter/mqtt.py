@@ -13,9 +13,9 @@ class MqttAdapter:
 
     def init(self):
         """Create MQTT-Client object with user configuration"""
-        self._client = mqtt.Client(CallbackAPIVersion.VERSION2, client_id=self._config['client_id'])
-        if self._config['user'] or self._config['password']:
-            self._client.username_pw_set(self._config['user'], self._config['password'])
+        self._client = mqtt.Client(CallbackAPIVersion.VERSION2, client_id=self._config["client_id"])
+        if self._config["user"] or self._config["password"]:
+            self._client.username_pw_set(self._config["user"], self._config["password"])
 
     def run(self):
         self._client.connect_async(self._config["host"], self._config["port"], keepalive=self._config["keepalive"])
@@ -35,12 +35,12 @@ class MqttAdapter:
         return topic.replace("{}/".format(self._config["topic"]), "")
 
     def subscribe(self, topic):
-        topic = "{}/{}".format(self._config['topic'], topic)
+        topic = "{}/{}".format(self._config["topic"], topic)
         self.log.info("Subscribing to topic: {0}".format(topic))
         self._client.subscribe(topic)
 
     def publish(self, topic, payload):
-        topic = "{}/{}".format(self._config['topic'], topic)
+        topic = "{}/{}".format(self._config["topic"], topic)
         self.log.info("Publish %s: %s, %s, %s", topic, payload, self._config["qos"], self._config["retain"])
 
         try:

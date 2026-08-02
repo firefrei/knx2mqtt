@@ -8,13 +8,13 @@ from xknx.telegram import AddressFilter
 class ConfigManager:
     """Class for parsing and managing the contents of the `knx2mqtt.yaml` configuration file."""
     
-    def __init__(self, file: str = 'logging.conf'):
+    def __init__(self, file: str = "logging.conf"):
         """Initialize Config class."""
         logging.debug("Reading %s", file)
         try:
             with open(file, 'r') as f:
                 D = yaml.load(f, Loader=yaml.SafeLoader)
-                D.setdefault('version', 1)
+                D.setdefault("version", 1)
                 logging.config.dictConfig(D)
             self._mqtt = {}
             self._knx = {}
@@ -30,7 +30,7 @@ class ConfigManager:
     def knx(self):
         return self._knx
 
-    def read(self, file: str = 'knx2mqtt.yaml'):
+    def read(self, file: str = "knx2mqtt.yaml"):
         """Open and read config file."""
         logging.debug("Reading %s", file)
         try:
@@ -47,13 +47,13 @@ class ConfigManager:
         knx_address_filters = []
         mqtt_subscriptions = []
 
-        for entity_type in ['sensors', 'switches']:
+        for entity_type in ["sensors", "switches"]:
             for entity in self._knx[entity_type]:
-                if not ('expose' in entity and entity['expose']):
-                    knx_address_filters.append(AddressFilter(entity['address']))
+                if not ("expose" in entity and entity["expose"]):
+                    knx_address_filters.append(AddressFilter(entity["address"]))
 
-                if ('expose' in entity and entity['expose']) or ('subscribe' in entity and entity['subscribe']):
-                    mqtt_subscriptions.append(entity['address'])
+                if ("expose" in entity and entity["expose"]) or ("subscribe" in entity and entity["subscribe"]):
+                    mqtt_subscriptions.append(entity["address"])
         
         return knx_address_filters, mqtt_subscriptions
 
