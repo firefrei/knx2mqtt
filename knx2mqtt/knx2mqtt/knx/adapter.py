@@ -5,9 +5,9 @@ import socket
 from xknx import XKNX
 from xknx.io import ConnectionConfig, ConnectionType
 from xknx.dpt import DPTBinary
-from xknx.telegram import AddressFilter, GroupAddressType
-from xknx.tools import group_value_write
+from xknx.telegram import GroupAddressType
 from xknx.core import XknxConnectionState
+from xknx.tools import group_value_write
 
 XKNX_DPT_MODULE_STR = "xknx.dpt"
 

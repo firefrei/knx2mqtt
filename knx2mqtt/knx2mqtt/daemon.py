@@ -1,10 +1,10 @@
 import asyncio
 
 from .config import ConfigManager
-from .adapter.mqtt import MqttAdapter
-from .adapter.knx import KnxAdapter
-from .telegram_handler.knx_to_mqtt import KnxToMqtt
-from .telegram_handler.mqtt_to_knx import MqttToKnx
+from .mqtt.adapter import MqttAdapter
+from .knx.adapter import KnxAdapter
+from .knx.event_handler import KnxEventHandler
+from .mqtt.event_handler import MqttEventHandler
 
 
 class Daemon:
@@ -16,19 +16,21 @@ class Daemon:
         self._init_handler()
 
     def _init_mqtt(self):
-        self._adapt_mqtt = MqttAdapter(self.config_mgr.mqtt)
-        self._adapt_mqtt.init()
+        self._mqtt_adapt = MqttAdapter(self.config_mgr.mqtt)
+        self._mqtt_adapt.init()
 
     def _init_knx(self):
-        self._adapt_knx = KnxAdapter(self.config_mgr.knx)
-        self._adapt_knx.init()
+        self._knx_adapt = KnxAdapter(self.config_mgr.knx)
+        self._knx_adapt.init()
 
     def _init_handler(self):
         knx_address_filters, mqtt_subscriptions = self.config_mgr.generate_address_filters_and_subscriptions()
-        KnxToMqtt(self._adapt_knx, self._adapt_mqtt, knx_address_filters=knx_address_filters)
-        self._handler_mqtt = MqttToKnx(self._adapt_knx, self._adapt_mqtt, mqtt_subscriptions=mqtt_subscriptions)
+
+        self._knx_handler = KnxEventHandler(self._knx_adapt, self._mqtt_adapt, knx_address_filters=knx_address_filters)
+        self._mqtt_handler = MqttEventHandler(self._knx_adapt, self._mqtt_adapt, mqtt_subscriptions=mqtt_subscriptions)
 
     async def run(self):
-        self._handler_mqtt.set_loop(asyncio.get_running_loop())
-        self._adapt_mqtt.run()
-        await self._adapt_knx.run()
+        self._mqtt_handler.set_loop(asyncio.get_running_loop())
+
+        self._mqtt_adapt.run()
+        await self._knx_adapt.run()

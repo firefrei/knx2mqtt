@@ -22,9 +22,11 @@ async def main():
     if args.config:
         user_read_cfg.update({"file": args.config})
 
-    # Setup app
+    # Read user configuration
     cfg = config.ConfigManager(**user_cfg)
     cfg.read(**user_read_cfg)
+
+    # Start app
     d = daemon.Daemon(cfg)
     await d.run()
 

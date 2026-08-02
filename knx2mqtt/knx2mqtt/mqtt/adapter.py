@@ -50,7 +50,7 @@ class MqttAdapter:
 
     def publish(self, topic, payload):
         topic = "{}/{}".format(self._config["topic"], topic)
-        self.log.info("Publish %s: %s, %s, %s", topic, payload, self._config["qos"], self._config["retain"])
+        self.log.debug("Publish %s: %s, %s, %s", topic, payload, self._config["qos"], self._config["retain"])
 
         try:
             self._client.publish(topic, payload, self._config["qos"], self._config["retain"])

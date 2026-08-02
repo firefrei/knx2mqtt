@@ -3,11 +3,11 @@ import logging
 
 from xknx.telegram import GroupAddress
 
-from ..adapter.knx import KnxAdapter
-from ..adapter.mqtt import MqttAdapter
+from ..knx.adapter import KnxAdapter
+from .adapter import MqttAdapter
 
 
-class MqttToKnx:
+class MqttEventHandler:
 
     def __init__(self, knx_adapter: KnxAdapter, mqtt_adapter: MqttAdapter, mqtt_subscriptions: list = None):
         self._knx = knx_adapter
@@ -27,35 +27,29 @@ class MqttToKnx:
         self._loop = loop
 
     def on_message(self, client, userdata, message):
-        try:
-            self.log.info("MQTT message received.")
+        topic = message.topic
+        value = str(message.payload.decode())
 
-            topic = message.topic
-            value = str(message.payload.decode())
+        self.log.info("MQTT message received on topic: {}".format(topic))
 
-            # Get KNX group address
-            address = self._mqtt.get_plain_topic(topic)
-            group_address = GroupAddress(address)
+        # Get KNX group address
+        address = self._mqtt.get_plain_topic(topic)
+        group_address = GroupAddress(address)
 
-            self.log.debug(f"Message {value} for topic {topic} --> KNX group address {group_address}.")
+        self.log.debug(f"Message {value} for topic {topic} --> KNX group address {group_address}.")
 
-            # Construct KNX value
-            dpt_value, dpt_type = self._knx.create_dpt_value(address, value)
+        # Construct KNX value
+        dpt_value, dpt_type = self._knx.create_dpt_value(address, value)
 
-            if self._loop is None:
-                self.log.error("No event loop configured for MQTT callback. The callback was invoked before the asyncio loop was registered.")
-                return False
+        if self._loop is None:
+            self.log.error("No event loop configured for MQTT callback. The callback was invoked before the asyncio loop was registered.")
+            return
 
-            # Publish dpt value on KNX bus from the MQTT callback context.
-            asyncio.run_coroutine_threadsafe(
-                self._knx.publish(group_address, dpt_value, dpt_type),
-                self._loop
-            )
-
-            return True
-
-        except Exception as e:
-            self.log.error(e)
+        # Publish dpt value on KNX bus from the MQTT callback context.
+        asyncio.run_coroutine_threadsafe(
+            self._knx.publish(group_address, dpt_value, dpt_type),
+            self._loop
+        )
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
         # Log connection state
