@@ -122,7 +122,6 @@ class KnxAdapter:
 
         return dpt_value, dpt_type
 
-
     async def publish(self, group_address, value, value_type = None):
         if self._xknx.started:
             group_value_write(self._xknx, group_address, value, value_type)

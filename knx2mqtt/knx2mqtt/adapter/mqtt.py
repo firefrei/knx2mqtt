@@ -30,14 +30,23 @@ class MqttAdapter:
 
     def set_connect_cb(self, cb):
         self._client.on_connect = cb
+    
+    def set_disconnect_cb(self, cb):
+        self._client.on_disconnect = cb
+
+    def set_connect_fail_cb(self, cb):
+        self._client.on_connect_fail = cb
 
     def get_plain_topic(self, topic):
         return topic.replace("{}/".format(self._config["topic"]), "")
 
     def subscribe(self, topic):
         topic = "{}/{}".format(self._config["topic"], topic)
-        self.log.info("Subscribing to topic: {0}".format(topic))
-        self._client.subscribe(topic)
+        result, message_id = self._client.subscribe(topic)
+        self.log.info(
+            "Subscribed to MQTT topic: %s [result=%s, mid=%s]",
+            topic, result, message_id,
+        )        
 
     def publish(self, topic, payload):
         topic = "{}/{}".format(self._config["topic"], topic)
