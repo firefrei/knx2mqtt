@@ -82,10 +82,9 @@ knx:
       gateway_ip: '192.168.0.11'
       gateway_port: 3671
       local_ip: '192.168.0.12'
-      local_port: 12399
-      route_back: true
+      route_back: true    # behind NAT -> "true"; else "false"
 ```
-Since the knx2mqtt bridge runs as a container, `route_back` must be set to `true` or the  network mode `host` has to be used for the container. The port `12399/udp` will be exposed by the container by default.
+Since the knx2mqtt bridge runs as a container, `route_back` must be set to `true` or the  network mode `host` has to be used for the container.
 
 As of today, the bridge supports `sensors` and `switches` as native entities:
 ```yaml
