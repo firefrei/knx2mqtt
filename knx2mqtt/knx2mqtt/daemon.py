@@ -16,8 +16,7 @@ class Daemon:
         self._init_handler()
 
     def _init_mqtt(self):
-        loop = asyncio.get_running_loop()
-        self._adapt_mqtt = MqttAdapter(self.config_mgr.mqtt, loop)
+        self._adapt_mqtt = MqttAdapter(self.config_mgr.mqtt)
         self._adapt_mqtt.init()
 
     def _init_knx(self):
@@ -28,6 +27,8 @@ class Daemon:
         KnxToMqtt(self._adapt_knx, self._adapt_mqtt)
         MqttToKnx(self._adapt_knx, self._adapt_mqtt)
 
-    async def run(self):
-        await self._adapt_mqtt.run()
-        await self._adapt_knx.run()
+    def run(self):
+        self._adapt_mqtt.run()
+        asyncio.run(
+            self._adapt_knx.run()
+        )

@@ -1,12 +1,11 @@
 #!python3
 
 import argparse
-import asyncio
 
 from knx2mqtt import config, daemon
 
 
-async def main():
+def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='A KNX to MQTT bridge with bidirectional telegram transfer')
     parser.add_argument('-c', '--config', type=str, help='Path to a knx2mqtt configuration file')
@@ -26,7 +25,7 @@ async def main():
     cfg = config.ConfigManager(**user_cfg)
     cfg.read(**user_read_cfg)
     d = daemon.Daemon(cfg)
-    await d.run()
+    d.run()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
