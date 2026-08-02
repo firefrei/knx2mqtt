@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from xknx.telegram import GroupAddress
@@ -36,9 +37,10 @@ class MqttToKnx:
             # Construct KNX value
             dpt_value, dpt_type = self._knx.create_dpt_value(address, value)
 
-            # Publish dpt value on KNX bus
-            self._mqtt._loop.create_task(
-                self._knx.publish(group_address, dpt_value, dpt_type)
+            # Publish dpt value on KNX bus from the MQTT callback context.
+            asyncio.run_coroutine_threadsafe(
+                self._knx.publish(group_address, dpt_value, dpt_type),
+                self._mqtt._loop,
             )
 
             return True
